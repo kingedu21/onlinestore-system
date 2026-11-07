@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1 class="h4 mb-4">Commission Report</h1>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Seller</th>
+                                <th>Product</th>
+                                <th>Order Price</th>
+                                <th>Commission Earned</th>
+                                <th>Seller Earnings</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in commissions %}
+                                <tr>
+                                    <td>#{{ row.order_id }}</td>
+                                    <td>{{ row.seller.name|default:"-" }}</td>
+                                    <td>{{ row.product.name }}</td>
+                                    <td>KSh {{ row.order_item.subtotal|intcomma }}</td>
+                                    <td>KSh {{ row.commission_amount|intcomma }}</td>
+                                    <td>KSh {{ row.seller_earning|intcomma }}</td>
+                                    <td>{{ row.created_at|date:"M d, Y" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-muted">No commission records yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

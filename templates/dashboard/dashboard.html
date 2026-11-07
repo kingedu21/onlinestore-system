@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 sidebar py-4">
+                <div class="sidebar-brand mb-4">Admin</div>
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products/product/"><i class="bi bi-box"></i> Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products/category/"><i class="bi bi-tags"></i> Categories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/orders/order/"><i class="bi bi-bag"></i> Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/accounts/user/"><i class="bi bi-people"></i> Customers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/payments/payment/"><i class="bi bi-credit-card"></i> Payments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'seller_applications' %}"><i class="bi bi-person-lines-fill"></i> Seller Applications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'seller_performance' %}"><i class="bi bi-clipboard-data"></i> Seller Performance</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mpesa_webhook_logs' %}"><i class="bi bi-receipt"></i> M-Pesa Webhooks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Reports</a></li>
+                    <li class="nav-item mt-2">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-link nav-link text-start" type="submit"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </aside>
+
+            <div class="col-lg-10 py-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                    <div>
+                        <h1 class="h4 fw-bold mb-1">Dashboard</h1>
+                        <p class="text-muted mb-0">Welcome back, {{ request.user.username }}</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
+                        <button class="btn btn-light border">
+                            <i class="bi bi-bell"></i>
+                        </button>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-dark" type="submit">Logout</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Total Orders</div>
+                                <div class="stat-value">{{ total_orders }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Pending Orders</div>
+                                <div class="stat-value">{{ pending_orders }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Completed Orders</div>
+                                <div class="stat-value">{{ completed_orders }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-value">KSh {{ total_revenue|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Commission Earned</div>
+                                <div class="stat-value">KSh {{ total_commission|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4 col-xl-2">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Seller Payouts</div>
+                                <div class="stat-value">KSh {{ total_seller_payouts|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-4">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Product Sales</div>
+                                <div class="stat-value">KSh {{ product_sales|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-label">Shipping Revenue</div>
+                                <div class="stat-value">KSh {{ shipping_revenue|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-8">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Sales & Commission Overview</h2>
+                                <canvas id="salesChart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Low Stock Alerts</h2>
+                                <ul class="list-group list-group-flush">
+                                    {% for product in low_stock %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ product.name }}
+                                            <span class="badge bg-danger-subtle text-danger">{{ product.stock }}</span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item text-muted">All products are well stocked.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-7">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Recent Orders</h2>
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Total</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in recent_orders %}
+                                                <tr>
+                                                    <td>#{{ order.id }}</td>
+                                                    <td>{{ order.user.username }}</td>
+                                                    <td>KSh {{ order.total_price|intcomma }}</td>
+                                                    <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
+                                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                                </tr>
+                                            {% empty %}
+                                                <tr>
+                                                    <td colspan="5" class="text-muted">No recent orders.</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Top Products</h2>
+                                <ul class="list-group list-group-flush">
+                                    {% for item in top_products %}
+                                        <li class="list-group-item">
+                                            <div class="fw-semibold">{{ item.product__name }}</div>
+                                            <div class="small text-muted">
+                                                Orders: {{ item.total_orders }} · Sales: KSh {{ item.total_sales|default:"0"|intcomma }}
+                                            </div>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item text-muted">No sales data yet.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Top Sellers</h2>
+                                <ul class="list-group list-group-flush">
+                                    {% for seller in top_sellers %}
+                                        <li class="list-group-item">
+                                            <div class="fw-semibold">{{ seller.seller__name|default:"Unknown" }}</div>
+                                            <div class="small text-muted">
+                                                Sales: KSh {{ seller.total_sales|default:"0"|intcomma }} · Commission: KSh {{ seller.total_commission|default:"0"|intcomma }}
+                                            </div>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item text-muted">No sellers data yet.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h2 class="h6 mb-3">Top Categories</h2>
+                                <ul class="list-group list-group-flush">
+                                    {% for cat in top_categories %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ cat.product__category__name }}
+                                            <span class="badge bg-light text-dark">KSh {{ cat.total_sales|default:"0"|intcomma }}</span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item text-muted">No category data yet.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: {{ chart_sales|safe }},
+                            borderColor: '#f68b1e',
+                            backgroundColor: 'rgba(246, 139, 30, 0.15)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Orders',
+                            data: {{ chart_orders|safe }},
+                            borderColor: '#6f46a6',
+                            backgroundColor: 'rgba(111, 70, 166, 0.12)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Commission',
+                            data: {{ chart_commission|safe }},
+                            borderColor: '#1f2f5c',
+                            backgroundColor: 'rgba(31, 47, 92, 0.12)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+{% endblock %}
+

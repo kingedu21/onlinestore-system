@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Checkout</h1>
+    <div class="alert alert-info">
+        We operate 24/7 online. Pickup hours: 8:00am – 8:00pm. Standard delivery: 1–3 days.
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <ul class="list-group mb-3">
+                {% for item in items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                        <span>KSh {{ item.product.price|intcomma }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">Your cart is empty.</li>
+                {% endfor %}
+            </ul>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-2">Delivery</h5>
+                    {% if delivery_county %}
+                        <p class="mb-1">Location: {{ delivery_county }}{% if delivery_town %}, {{ delivery_town }}{% endif %}</p>
+                        <p class="mb-1">Method: {{ delivery_method|title }}</p>
+                        <p class="mb-0">Shipping fee: <strong>KSh {{ shipping_fee|intcomma }}</strong></p>
+                        <a class="d-inline-block mt-2 small" href="{% url 'delivery_confirm' %}">Change delivery details</a>
+                    {% else %}
+                        <p class="mb-0 text-muted">Delivery details not selected.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">Payment Method</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if error %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endif %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="payment_method" value="mpesa" checked>
+                            <label class="form-check-label">M-Pesa</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="mpesa_phone">M-Pesa Phone Number</label>
+                            <input
+                                class="form-control"
+                                id="mpesa_phone"
+                                name="mpesa_phone"
+                                placeholder="07XXXXXXXX"
+                                type="text"
+                                value="{{ mpesa_phone }}"
+                            >
+                            <div class="form-text">We will send an STK prompt to this number.</div>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="payment_method" value="card">
+                            <label class="form-check-label">Card</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" value="cash">
+                            <label class="form-check-label">Cash on Delivery</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="coupon_code">Coupon Code</label>
+                            <input
+                                class="form-control"
+                                id="coupon_code"
+                                name="coupon_code"
+                                placeholder="SAVE10"
+                                type="text"
+                                value="{{ coupon_code }}"
+                            >
+                            <div class="form-text">Apply a valid coupon for a discount.</div>
+                        </div>
+                        <p class="mb-1">Subtotal: KSh {{ cart_subtotal|intcomma }}</p>
+                        {% if discount_amount and discount_amount > 0 %}
+                            <p class="mb-1 text-success">Discount: -KSh {{ discount_amount|intcomma }}</p>
+                        {% endif %}
+                        <p class="mb-3">Shipping: KSh {{ shipping_fee|intcomma }}</p>
+                        <div class="alert alert-light border mb-3">
+                            All items in your cart are combined into one order and paid together in a single payment.
+                        </div>
+                        <p class="fw-semibold">Total: KSh {{ order_total_preview|intcomma }}</p>
+                        {% if user.role == 'customer' %}
+                            <button type="submit" class="btn btn-accent w-100">Place Order</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

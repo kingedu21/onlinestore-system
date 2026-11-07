@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h4 mb-0">Seller Performance</h1>
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Sellers</div>
+                        <div class="stat-value">{{ total_sellers }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Sales</div>
+                        <div class="stat-value">KSh {{ total_sales|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value">{{ total_orders }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Avg Rating</div>
+                        <div class="stat-value">{{ avg_rating_overall }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h6 mb-3">Top Sellers (Sales & Orders)</h2>
+                <canvas id="sellerPerformanceChart" height="120"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Seller</th>
+                                <th>Products Listed</th>
+                                <th>Total Sales</th>
+                                <th>Total Orders</th>
+                                <th>Avg Rating</th>
+                                <th>Cancelled Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.seller.store_name }}</td>
+                                    <td>{{ row.products_listed }}</td>
+                                    <td>KSh {{ row.total_sales|intcomma }}</td>
+                                    <td>{{ row.total_orders }}</td>
+                                    <td>{{ row.avg_rating }}</td>
+                                    <td>{{ row.cancelled_orders }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-muted">No sellers found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var ctx = document.getElementById('sellerPerformanceChart');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [
+                        {
+                            label: 'Sales (KSh)',
+                            data: {{ chart_sales|safe }},
+                            backgroundColor: 'rgba(246, 139, 30, 0.4)',
+                            borderColor: '#f68b1e',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Orders',
+                            data: {{ chart_orders|safe }},
+                            backgroundColor: 'rgba(31, 47, 92, 0.35)',
+                            borderColor: '#1f2f5c',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        })();
+    </script>
+{% endblock %}

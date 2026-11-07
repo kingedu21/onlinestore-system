@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="h4 mb-3">Order placed successfully</h1>
+                <p class="mb-1">Order ID: <strong>#{{ order.id }}</strong></p>
+                <p class="mb-4">Total: <strong>KSh {{ order.total_price|intcomma }}</strong></p>
+                <div class="alert alert-light border" role="alert">
+                    Your items were combined into one order and paid together in a single payment.
+                </div>
+                {% if order.payment_method == 'mpesa' and order.payment_status == 'pending' %}
+                    <div class="alert alert-info" role="alert">
+                        An M-Pesa STK prompt was sent. Complete the payment on your phone to finalize this order.
+                    </div>
+                {% endif %}
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <a class="btn btn-outline-primary" href="{% url 'order_invoice' order.id %}">View Invoice</a>
+                    {% if receipt %}
+                        <a class="btn btn-primary" href="{% url 'order_receipt' order.id %}">View Receipt</a>
+                    {% else %}
+                        <span class="btn btn-primary disabled" aria-disabled="true">Receipt Available After Payment</span>
+                    {% endif %}
+                    <a class="btn btn-outline-secondary" href="{% url 'user_orders' %}">My Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="h4 mb-1">{{ seller.store_name }}</h1>
+                <p class="text-muted mb-1">Rating: {{ seller.rating }}</p>
+                <p class="text-muted mb-1">{{ seller.email }}</p>
+                <p class="text-muted mb-0">{{ seller.phone }}</p>
+            </div>
+        </div>
+
+        <h2 class="h5 mb-3">Products by {{ seller.store_name }}</h2>
+        <div class="row g-4">
+            {% for product in products %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card product-card h-100"{% if product.image %} style="--hover-bg: url('{{ product.image.url }}')" {% endif %}>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                <span class="text-muted">No image</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">{{ product.name }}</h6>
+                            <p class="fw-semibold price-tag mb-0">KSh {{ product.price|intcomma }}</p>
+                            <div class="rating-stars small mt-2">
+                                {% for i in "12345"|make_list %}
+                                    {% if product.avg_rating|default:0 >= forloop.counter %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                            </div>
+                            <a class="stretched-link" href="{% url 'product_detail' product.id %}"></a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No products for this seller yet.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

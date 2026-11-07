@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h4 mb-0">Seller Applications</h1>
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Applicant Name</th>
+                                <th>Business Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>ID Number</th>
+                                <th>Payment Account</th>
+                                <th>Business Reg</th>
+                                <th>Status</th>
+                                <th>Date Applied</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                                <tr>
+                                    <td>{{ application.full_name }}</td>
+                                    <td>{{ application.business_name }}</td>
+                                    <td>{{ application.email }}</td>
+                                    <td>{{ application.phone_number }}</td>
+                                    <td>{{ application.id_number }}</td>
+                                    <td>{{ application.mpesa_number }}</td>
+                                    <td>{{ application.business_registration }}</td>
+                                    <td>
+                                        {% if application.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif application.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ application.created_at|date:"M d, Y" }}</td>
+                                    <td class="text-end">
+                                        <form method="post" action="{% url 'approve_seller_application' application.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button class="btn btn-sm btn-outline-success" type="submit">Approve</button>
+                                        </form>
+                                        <form method="post" action="{% url 'reject_seller_application' application.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-muted">No applications yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

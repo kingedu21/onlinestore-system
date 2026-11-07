@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h4 mb-3">My Account</h1>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="text-muted small">Username</div>
+                            <div class="fw-semibold">{{ user.username }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-muted small">Role</div>
+                            <div class="fw-semibold">{{ user.role|title }}</div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-accent">Save Changes</button>
+                    </form>
+                    <div class="mt-4 d-flex gap-2">
+                        {% if user.role == 'customer' %}
+                            <a class="btn btn-outline-secondary" href="{% url 'user_orders' %}">View Orders</a>
+                        {% endif %}
+                        <a class="btn btn-primary" href="{% url 'product_list' %}">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 mt-4 mt-lg-0">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Notifications</h2>
+                    {% for note in notifications %}
+                        <div class="border-bottom pb-2 mb-2">
+                            <div class="small text-muted">{{ note.created_at|date:"M d, Y H:i" }}</div>
+                            <div>{{ note.message }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="text-muted">No notifications yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h4 mb-0">Manage Sellers</h1>
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Seller</th>
+                                <th>Store Name</th>
+                                <th>Total Products</th>
+                                <th>Total Orders</th>
+                                <th>Total Sales</th>
+                                <th>Total Earnings</th>
+                                <th>Commission Paid</th>
+                                <th>Status</th>
+                                <th>Flag</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    <td>{{ row.seller.user.username|default:"-" }}</td>
+                                    <td>{{ row.seller.store_name }}</td>
+                                    <td>{{ row.total_products }}</td>
+                                    <td>{{ row.total_orders }}</td>
+                                    <td>KSh {{ row.total_sales|intcomma }}</td>
+                                    <td>KSh {{ row.total_earnings|intcomma }}</td>
+                                    <td>KSh {{ row.total_commission|intcomma }}</td>
+                                    <td>
+                                        {% if row.seller.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Suspended</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row.seller.is_suspicious %}
+                                            <span class="badge bg-warning text-dark">Suspicious</span>
+                                            {% if row.seller.suspicious_reason %}
+                                                <div class="small text-muted">{{ row.seller.suspicious_reason }}</div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted small">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a class="btn btn-outline-primary btn-sm" href="{% url 'admin_seller_dashboard' row.seller.id %}">
+                                            View Dashboard
+                                        </a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="/admin/products/product/?seller__id__exact={{ row.seller.id }}">
+                                            View Products
+                                        </a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="/admin/orders/order/?items__product__seller__id__exact={{ row.seller.id }}">
+                                            View Orders
+                                        </a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'toggle_seller_status' row.seller.id %}">
+                                            {% if row.seller.is_active %}Suspend{% else %}Activate{% endif %}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-muted">No sellers found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

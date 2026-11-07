@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1 class="h4 mb-4">My Wishlist</h1>
+        <div class="row g-4">
+            {% for item in items %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card product-card h-100"{% if item.product.image %} style="--hover-bg: url('{{ item.product.image.url }}')" {% endif %}>
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+                        {% else %}
+                            <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                <span class="text-muted">No image</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">{{ item.product.name }}</h6>
+                            <p class="fw-semibold mb-3">KSh {{ item.product.price|intcomma }}</p>
+                            <div class="mt-auto d-flex gap-2">
+                                <a class="btn btn-outline-primary w-100" href="{% url 'product_detail' item.product.id %}">View</a>
+                                <a class="btn btn-outline-danger w-100" href="{% url 'remove_from_wishlist' item.product.id %}">
+                                    Remove
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">Your wishlist is empty.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

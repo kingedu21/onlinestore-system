@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if user.role == 'customer' %}
+    <div class="container py-5">
+        <div class="alert alert-info">
+            We operate 24/7 online. Pickup hours: 8:00am – 8:00pm. Standard delivery: 1–3 days.
+        </div>
+        <h1 class="h4 mb-4">Delivery & Return Information</h1>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Delivery Information</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Choose your location</label>
+                            <select class="form-select" id="countySelect">
+                                <option>Baringo</option>
+                                <option>Bomet</option>
+                                <option>Bungoma</option>
+                                <option>Busia</option>
+                                <option>Elgeyo-Marakwet</option>
+                                <option>Embu</option>
+                                <option>Garissa</option>
+                                <option>Homa Bay</option>
+                                <option>Isiolo</option>
+                                <option>Kajiado</option>
+                                <option>Kakamega</option>
+                                <option>Kericho</option>
+                                <option>Kiambu</option>
+                                <option>Kilifi</option>
+                                <option>Kirinyaga</option>
+                                <option>Kisii</option>
+                                <option>Kisumu</option>
+                                <option>Kitui</option>
+                                <option>Kwale</option>
+                                <option>Laikipia</option>
+                                <option>Lamu</option>
+                                <option>Machakos</option>
+                                <option>Makueni</option>
+                                <option>Mandera</option>
+                                <option>Marsabit</option>
+                                <option>Meru</option>
+                                <option>Migori</option>
+                                <option>Mombasa</option>
+                                <option>Murang'a</option>
+                                <option>Nairobi</option>
+                                <option>Nakuru</option>
+                                <option>Nandi</option>
+                                <option>Narok</option>
+                                <option>Nyamira</option>
+                                <option>Nyandarua</option>
+                                <option>Nyeri</option>
+                                <option>Samburu</option>
+                                <option>Siaya</option>
+                                <option>Taita-Taveta</option>
+                                <option>Tana River</option>
+                                <option>Tharaka-Nithi</option>
+                                <option>Trans Nzoia</option>
+                                <option>Turkana</option>
+                                <option>Uasin Gishu</option>
+                                <option>Vihiga</option>
+                                <option>Wajir</option>
+                                <option>West Pokot</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Delivery area</label>
+                            <select class="form-select" id="townSelect">
+                                <option>Select a county first</option>
+                            </select>
+                        </div>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="delivery_method" id="pickupStation" checked>
+                                    <label class="form-check-label" for="pickupStation">
+                                        <strong>Pickup Station</strong>
+                                    </label>
+                                </div>
+                                <p class="mb-1">Delivery Fees <span id="pickupFee">KSh 70</span></p>
+                                <p class="small text-muted mb-0">Ready for pickup within 1-3 days</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="delivery_method" id="doorDelivery">
+                                    <label class="form-check-label" for="doorDelivery">
+                                        <strong>Door Delivery</strong>
+                                    </label>
+                                </div>
+                                <p class="mb-1">Delivery Fees <span id="doorFee">KSh 160</span></p>
+                                <p class="small text-muted mb-0">Ready for delivery within 2-5 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Return Policy</h5>
+                        <p class="mb-1">Return within 7 days</p>
+                        <p class="mb-0">Items must be in original condition and packaging</p>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Seller Information</h5>
+                        {% if product.seller %}
+                            <p class="mb-1">{{ product.seller.store_name }}</p>
+                            <p class="mb-1">Rating: {{ product.seller.rating }}</p>
+                            <p class="mb-0">{{ product.seller.email }}</p>
+                        {% else %}
+                            <p class="mb-0 text-muted">No seller information available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if variations %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-3">Choose Variation</h5>
+                            {% if selected_variation %}
+                                <p class="small text-muted mb-2">
+                                    Selected: <strong>{{ selected_variation.name }}: {{ selected_variation.value }}</strong>
+                                </p>
+                            {% endif %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for v in variations %}
+                                    <span class="badge {% if selected_variation and selected_variation.id == v.id %}bg-warning text-dark{% else %}bg-light text-dark border{% endif %}">
+                                        {{ v.name }}: {{ v.value }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        <p class="mb-1">Product: {{ product.name }}</p>
+                        <p class="mb-1">Cart items: {{ cart.items.count }}</p>
+                        <p class="mb-1">Delivery method: <span id="deliveryMethodLabel">Pickup Station</span></p>
+                        <p class="mb-1">Delivery fee: <span id="deliveryFeeSummary">KSh 70</span></p>
+                        <p class="fw-semibold mb-3">Total: KSh {{ cart.total_price|intcomma }}</p>
+                        <form method="get" action="{% url 'checkout' %}">
+                            <input type="hidden" name="delivery_county" id="deliveryCountyInput">
+                            <input type="hidden" name="delivery_town" id="deliveryTownInput">
+                            <input type="hidden" name="delivery_method" id="deliveryMethodInput">
+                            <button class="btn btn-accent w-100" type="submit">Continue to Payment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var townsByCounty = {
+                "Baringo": ["Kabarnet", "Eldama Ravine", "Marigat", "Mogotio", "Kabartonjo", "Tenges"],
+                "Bomet": ["Bomet", "Sotik", "Longisa", "Mulot", "Chepalungu", "Sigor"],
+                "Bungoma": ["Bungoma", "Webuye", "Kimilili", "Chwele", "Sirisia", "Malakisi"],
+                "Busia": ["Busia", "Malaba", "Nambale", "Port Victoria", "Bumala", "Funyula"],
+                "Elgeyo-Marakwet": ["Iten", "Tambach", "Kapsowar", "Chepkorio", "Tot", "Kamariny"],
+                "Embu": ["Embu", "Runyenjes", "Siakago", "Kiritiri", "Manyatta", "Ishiara"],
+                "Garissa": ["Garissa", "Dadaab", "Fafi", "Hulugho", "Balambala", "Bura East"],
+                "Homa Bay": ["Homa Bay", "Mbita", "Oyugis", "Kendu Bay", "Ndhiwa", "Rangwe"],
+                "Isiolo": ["Isiolo", "Merti", "Garba Tulla", "Kinna", "Bulesa"],
+                "Kajiado": ["Kajiado", "Ngong", "Kitengela", "Ongata Rongai", "Namanga", "Loitokitok"],
+                "Kakamega": ["Kakamega", "Mumias", "Butere", "Malava", "Lugari", "Matungu"],
+                "Kericho": ["Kericho", "Litein", "Kipkelion", "Ainamoi", "Kapsoit", "Sosiot"],
+                "Kiambu": ["Thika", "Kiambu", "Ruiru", "Limuru", "Githunguri", "Juja"],
+                "Kilifi": ["Kilifi", "Malindi", "Watamu", "Mariakani", "Mtwapa", "Rabai"],
+                "Kirinyaga": ["Kerugoya", "Kutus", "Wang'uru", "Kianyaga", "Sagana", "Baricho"],
+                "Kisii": ["Kisii", "Ogembo", "Suneka", "Nyamache", "Keroka", "Tabaka"],
+                "Kisumu": ["Kisumu", "Ahero", "Maseno", "Kondele", "Miwani", "Nyakach"],
+                "Kitui": ["Kitui", "Mwingi", "Mutomo", "Mwingi Central", "Ikutha", "Kwa Vonza"],
+                "Kwale": ["Kwale", "Diani", "Msambweni", "Lunga Lunga", "Kinango", "Ukunda"],
+                "Laikipia": ["Nanyuki", "Nyahururu", "Rumuruti", "Doldol", "Lamuria", "Ol Moran"],
+                "Lamu": ["Lamu", "Mpeketoni", "Faza", "Kiunga", "Hindi"],
+                "Machakos": ["Machakos", "Athi River", "Kangundo", "Mavoko", "Mwala", "Masii"],
+                "Makueni": ["Wote", "Mtito Andei", "Emali", "Kibwezi", "Makindu", "Sultan Hamud"],
+                "Mandera": ["Mandera", "Elwak", "Rhamu", "Lafey", "Takaba"],
+                "Marsabit": ["Marsabit", "Moyale", "Sololo", "Loiyangalani", "Laisamis"],
+                "Meru": ["Meru", "Maua", "Nkubu", "Timau", "Mikinduri", "Laare"],
+                "Migori": ["Migori", "Awendo", "Rongo", "Kehancha", "Isebania", "Nyatike"],
+                "Mombasa": ["Mombasa", "Nyali", "Likoni", "Kisauni", "Changamwe", "Mvita"],
+                "Murang'a": ["Murang'a", "Kangema", "Kiharu", "Kenol", "Kandara", "Makuyu"],
+                "Nairobi": ["CBD", "Westlands", "South B", "Embakasi", "Rongai", "Kasarani", "Lang'ata", "Gikambura"],
+                "Nakuru": ["Nakuru", "Naivasha", "Molo", "Gilgil", "Njoro", "Bahati"],
+                "Nandi": ["Kapsabet", "Nandi Hills", "Mosoriot", "Kobujoi", "Kaptumo"],
+                "Narok": ["Narok", "Kilgoris", "Suswa", "Ololulunga", "Mai Mahiu"],
+                "Nyamira": ["Nyamira", "Nyansiongo", "Keroka", "Manga", "Ekerenyo"],
+                "Nyandarua": ["Ol Kalou", "Njabini", "Engineer", "Nyahururu", "Ol Joro Orok", "Shamata"],
+                "Nyeri": ["Nyeri", "Othaya", "Karatina", "Naro Moru", "Mukurweini", "Mathira"],
+                "Samburu": ["Maralal", "Baragoi", "Wamba", "Archers Post", "Suguta"],
+                "Siaya": ["Siaya", "Bondo", "Ugunja", "Yala", "Ukwala", "Usenge"],
+                "Taita-Taveta": ["Voi", "Taveta", "Wundanyi", "Mwatate", "Kasigau"],
+                "Tana River": ["Hola", "Garsen", "Bura", "Madogo", "Kipini"],
+                "Tharaka-Nithi": ["Chuka", "Kathwana", "Marimanti", "Chiakariga", "Gatunga"],
+                "Trans Nzoia": ["Kitale", "Kiminini", "Endebess", "Saboti", "Kwanza"],
+                "Turkana": ["Lodwar", "Lokichoggio", "Kakuma", "Lokitaung", "Kalokol"],
+                "Uasin Gishu": ["Eldoret", "Turbo", "Moiben", "Ziwa", "Soy", "Ainabkoi"],
+                "Vihiga": ["Vihiga", "Luanda", "Mbale", "Chavakali", "Hamisi", "Kaimosi"],
+                "Wajir": ["Wajir", "Habaswein", "Eldas", "Buna", "Tarbaj"],
+                "West Pokot": ["Kapenguria", "Makutano", "Sigor", "Chepareria", "Ortum"]
+            };
+
+            var countySelect = document.getElementById('countySelect');
+            var townSelect = document.getElementById('townSelect');
+            if (!countySelect || !townSelect) return;
+
+            var countyDistanceKm = {
+                "Nairobi": 5,
+                "Kiambu": 20,
+                "Kajiado": 40,
+                "Machakos": 60,
+                "Murang'a": 80,
+                "Nyandarua": 140,
+                "Nyeri": 150,
+                "Kirinyaga": 120,
+                "Embu": 140,
+                "Tharaka-Nithi": 190,
+                "Meru": 220,
+                "Laikipia": 210,
+                "Nakuru": 160,
+                "Narok": 150,
+                "Bomet": 240,
+                "Kericho": 260,
+                "Nandi": 300,
+                "Uasin Gishu": 310,
+                "Trans Nzoia": 320,
+                "Bungoma": 380,
+                "Kakamega": 350,
+                "Vihiga": 350,
+                "Busia": 430,
+                "Siaya": 380,
+                "Kisumu": 350,
+                "Homa Bay": 370,
+                "Migori": 420,
+                "Kisii": 330,
+                "Nyamira": 340,
+                "Baringo": 280,
+                "Elgeyo-Marakwet": 290,
+                "West Pokot": 420,
+                "Samburu": 360,
+                "Turkana": 650,
+                "Isiolo": 280,
+                "Marsabit": 560,
+                "Mandera": 760,
+                "Wajir": 520,
+                "Garissa": 360,
+                "Tana River": 450,
+                "Lamu": 500,
+                "Kilifi": 480,
+                "Mombasa": 485,
+                "Kwale": 520,
+                "Taita-Taveta": 350,
+                "Kitui": 160,
+                "Makueni": 150
+            };
+
+            var pickupBase = 60;
+            var pickupPerKm = 1;
+            var doorBase = 100;
+            var doorPerKm = 1;
+            var pickupFeeEl = document.getElementById('pickupFee');
+            var doorFeeEl = document.getElementById('doorFee');
+            var summaryFeeEl = document.getElementById('deliveryFeeSummary');
+            var methodLabelEl = document.getElementById('deliveryMethodLabel');
+            var pickupRadio = document.getElementById('pickupStation');
+            var doorRadio = document.getElementById('doorDelivery');
+            var countyInput = document.getElementById('deliveryCountyInput');
+            var townInput = document.getElementById('deliveryTownInput');
+            var methodInput = document.getElementById('deliveryMethodInput');
+
+            function formatKsh(value) {
+                return Number(value || 0).toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            function updateTowns() {
+                var county = countySelect.value;
+                var towns = townsByCounty[county] || [];
+                townSelect.innerHTML = '';
+                if (!towns.length) {
+                    var opt = document.createElement('option');
+                    opt.textContent = 'Select a county first';
+                    townSelect.appendChild(opt);
+                    return;
+                }
+                towns.forEach(function (town) {
+                    var opt = document.createElement('option');
+                    opt.value = town;
+                    opt.textContent = town;
+                    townSelect.appendChild(opt);
+                });
+            }
+
+            function updateFee() {
+                var county = countySelect.value;
+                var km = countyDistanceKm[county] || 50;
+                var pickupFee = pickupBase + (pickupPerKm * km);
+                var doorFee = doorBase + (doorPerKm * km);
+
+                if (pickupFeeEl) pickupFeeEl.textContent = 'KSh ' + formatKsh(pickupFee);
+                if (doorFeeEl) doorFeeEl.textContent = 'KSh ' + formatKsh(doorFee);
+
+                var selectedMethod = (doorRadio && doorRadio.checked) ? 'Door Delivery' : 'Pickup Station';
+                var selectedFee = (doorRadio && doorRadio.checked) ? doorFee : pickupFee;
+                if (methodLabelEl) methodLabelEl.textContent = selectedMethod;
+                if (summaryFeeEl) summaryFeeEl.textContent = 'KSh ' + formatKsh(selectedFee);
+
+                if (countyInput) countyInput.value = county;
+                if (townInput) townInput.value = townSelect.value;
+                if (methodInput) methodInput.value = (doorRadio && doorRadio.checked) ? 'door' : 'pickup';
+            }
+
+            countySelect.addEventListener('change', function () {
+                updateTowns();
+                updateFee();
+            });
+            townSelect.addEventListener('change', updateFee);
+            if (pickupRadio) pickupRadio.addEventListener('change', updateFee);
+            if (doorRadio) doorRadio.addEventListener('change', updateFee);
+
+            updateTowns();
+            updateFee();
+        })();
+    </script>
+    {% else %}
+        <div class="alert alert-warning">Access restricted. Only customers can proceed to checkout.</div>
+    {% endif %}
+{% endblock %}
+

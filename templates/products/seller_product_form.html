@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h4 mb-1">Add Product</h1>
+                <p class="text-muted mb-0">{{ seller.store_name }}</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="{% url 'seller_products' %}">Back to Products</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="row g-3">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="col-12">
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        </div>
+                    {% endif %}
+                    {% if formset.non_form_errors %}
+                        <div class="col-12">
+                            <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.name.id_for_label }}">Product Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.price.id_for_label }}">Price</label>
+                        {{ form.price }}
+                        {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors }}</div>{% endif %}
+                    </div>
+                    {% if form.seller %}
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.seller.id_for_label }}">Seller</label>
+                            {{ form.seller }}
+                            {% if form.seller.errors %}<div class="text-danger small">{{ form.seller.errors }}</div>{% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.stock.id_for_label }}">Stock</label>
+                        {{ form.stock }}
+                        {% if form.stock.errors %}<div class="text-danger small">{{ form.stock.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.category.id_for_label }}">Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.subcategory.id_for_label }}">Subcategory</label>
+                        {{ form.subcategory }}
+                        {% if form.subcategory.errors %}<div class="text-danger small">{{ form.subcategory.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.condition.id_for_label }}">Condition</label>
+                        {{ form.condition }}
+                        {% if form.condition.errors %}<div class="text-danger small">{{ form.condition.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.image.id_for_label }}">Image</label>
+                        {{ form.image }}
+                        {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.extra_images.id_for_label }}">More Images</label>
+                        {{ form.extra_images }}
+                        {% if form.extra_images.help_text %}
+                            <div class="form-text">{{ form.extra_images.help_text }}</div>
+                        {% endif %}
+                        {% if form.extra_images.errors %}<div class="text-danger small">{{ form.extra_images.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <h2 class="h6 mt-2 mb-2">Variations</h2>
+                        <p class="text-muted small mb-3">Optional. Add size, color, or other variations.</p>
+                        {{ formset.management_form }}
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                        <th>Price Modifier</th>
+                                        <th>Stock</th>
+                                        <th>Active</th>
+                                        <th>Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vform in formset %}
+                                        <tr>
+                                            <td>{{ vform.name }}</td>
+                                            <td>{{ vform.value }}</td>
+                                            <td>{{ vform.price_modifier }}</td>
+                                            <td>{{ vform.stock }}</td>
+                                            <td>{{ vform.is_active }}</td>
+                                            <td>{{ vform.DELETE }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if formset.errors and formset.errors|length > 0 %}
+                            {% if formset.errors|join:""|length > 0 %}
+                                <div class="text-danger small">Please fix the highlighted variation fields.</div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-accent" type="submit">Submit for Approval</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

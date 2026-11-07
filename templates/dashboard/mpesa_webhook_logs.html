@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 sidebar py-4">
+                <div class="sidebar-brand mb-4">Admin</div>
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products/product/"><i class="bi bi-box"></i> Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products/category/"><i class="bi bi-tags"></i> Categories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/orders/order/"><i class="bi bi-bag"></i> Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/accounts/user/"><i class="bi bi-people"></i> Customers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/payments/payment/"><i class="bi bi-credit-card"></i> Payments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'seller_applications' %}"><i class="bi bi-person-lines-fill"></i> Seller Applications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'seller_performance' %}"><i class="bi bi-clipboard-data"></i> Seller Performance</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'mpesa_webhook_logs' %}"><i class="bi bi-receipt"></i> M-Pesa Webhooks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mpesa_callback_file_logs' %}"><i class="bi bi-journal-text"></i> Callback File Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Reports</a></li>
+                    <li class="nav-item mt-2">
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-link nav-link text-start" type="submit"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </aside>
+
+            <div class="col-lg-10 py-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                    <div>
+                        <h1 class="h4 fw-bold mb-1">M-Pesa Webhook Logs</h1>
+                        <p class="text-muted mb-0">Latest callbacks (last 200).</p>
+                    </div>
+                    <div class="mt-3 mt-md-0">
+                        <a class="btn btn-outline-secondary" href="{% url 'mpesa_callback_file_logs' %}">
+                            View Callback File Logs
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form class="row g-2 align-items-end">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label" for="q">Search</label>
+                                <input class="form-control" id="q" name="q" type="text" value="{{ query }}" placeholder="Order ID, receipt, checkout ID, phone">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="form-label" for="status">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All</option>
+                                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="success" {% if status == 'success' %}selected{% endif %}>Success</option>
+                                    <option value="failed" {% if status == 'failed' %}selected{% endif %}>Failed</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="form-label" for="result_code">Result Code</label>
+                                <input class="form-control" id="result_code" name="result_code" type="text" value="{{ result_code }}" placeholder="0">
+                            </div>
+                            <div class="col-12 col-md-2">
+                                <button class="btn btn-accent w-100" type="submit">Filter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Status</th>
+                                        <th>Result</th>
+                                        <th>Amount</th>
+                                        <th>Phone</th>
+                                        <th>Receipt</th>
+                                        <th>Time</th>
+                                        <th>Payload</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                        <tr>
+                                            <td>#{{ payment.order_id }}</td>
+                                            <td>
+                                                {% if payment.status == 'success' %}
+                                                    <span class="badge bg-success-subtle text-success">Success</span>
+                                                {% elif payment.status == 'failed' %}
+                                                    <span class="badge bg-danger-subtle text-danger">Failed</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ payment.result_code|default:"-" }}</td>
+                                            <td>KSh {{ payment.amount|intcomma }}</td>
+                                            <td>{{ payment.phone_number|default:"-" }}</td>
+                                            <td>{{ payment.mpesa_receipt_number|default:"-" }}</td>
+                                            <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                                            <td>
+                                                {% if payment.raw_callback %}
+                                                    <details>
+                                                        <summary>View</summary>
+                                                        <pre class="small mb-0">{{ payment.raw_callback|pprint }}</pre>
+                                                    </details>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="8" class="text-muted text-center">No webhook logs found.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

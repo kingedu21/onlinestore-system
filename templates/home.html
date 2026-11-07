@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div id="heroCarousel" class="carousel slide carousel-dark" data-bs-ride="carousel" data-bs-interval="4500">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <h1 class="display-5 fw-bold">Electronics Picks</h1>
+                                <p class="lead">Shop the latest gadgets and must-have tech.</p>
+                                <a class="btn btn-accent btn-lg" href="{% if electronics_category %}{% url 'product_list' %}?category={{ electronics_category.id }}{% else %}{% url 'product_list' %}{% endif %}">Shop Electronics</a>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="hero-visual">
+                                    {% if hero_electronics %}
+                                        {% for product in hero_electronics %}
+                                            <div class="hero-image {% if forloop.counter == 1 %}hero-image-primary{% elif forloop.counter == 2 %}hero-image-secondary{% else %}hero-image-tertiary{% endif %}">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="hero-image hero-image-primary">
+                                            <img src="{% static 'img/hero-deals.svg' %}" alt="Top Deals">
+                                        </div>
+                                        <div class="hero-image hero-image-secondary">
+                                            <img src="{% static 'img/hero-bestsellers.svg' %}" alt="Best Sellers">
+                                        </div>
+                                        <div class="hero-image hero-image-tertiary">
+                                            <img src="{% static 'img/hero-arrivals.svg' %}" alt="New Arrivals">
+                                        </div>
+                                    {% endif %}
+                                    <div class="hero-tag">Electronics</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <h2 class="display-6 fw-bold">Second Hand Deals</h2>
+                                <p class="lead">Quality pre-owned items at the best prices.</p>
+                                <a class="btn btn-accent btn-lg" href="{% url 'product_list' %}?condition=used">Shop Second Hand</a>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="hero-visual">
+                                    {% if hero_secondhand %}
+                                        {% for product in hero_secondhand %}
+                                            <div class="hero-image {% if forloop.counter == 1 %}hero-image-primary{% elif forloop.counter == 2 %}hero-image-secondary{% else %}hero-image-tertiary{% endif %}">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="hero-image hero-image-primary">
+                                            <img src="{% static 'img/hero-bestsellers.svg' %}" alt="Second Hand">
+                                        </div>
+                                        <div class="hero-image hero-image-secondary">
+                                            <img src="{% static 'img/hero-deals.svg' %}" alt="Deals">
+                                        </div>
+                                        <div class="hero-image hero-image-tertiary">
+                                            <img src="{% static 'img/hero-arrivals.svg' %}" alt="Trending">
+                                        </div>
+                                    {% endif %}
+                                    <div class="hero-tag">Second Hand</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-6">
+                                <h2 class="display-6 fw-bold">Home Appliances & Decor</h2>
+                                <p class="lead">Upgrade your home with reliable essentials and stylish decor.</p>
+                                <a class="btn btn-accent btn-lg" href="{% if home_appliance_category %}{% url 'product_list' %}?category={{ home_appliance_category.id }}{% else %}{% url 'product_list' %}{% endif %}">Shop Home & Decor</a>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="hero-visual">
+                                    {% if hero_home_appliances %}
+                                        {% for product in hero_home_appliances %}
+                                            <div class="hero-image {% if forloop.counter == 1 %}hero-image-primary{% elif forloop.counter == 2 %}hero-image-secondary{% else %}hero-image-tertiary{% endif %}">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="hero-image hero-image-primary">
+                                            <img src="{% static 'img/hero-arrivals.svg' %}" alt="Trending Now">
+                                        </div>
+                                        <div class="hero-image hero-image-secondary">
+                                            <img src="{% static 'img/hero-deals.svg' %}" alt="Deals">
+                                        </div>
+                                        <div class="hero-image hero-image-tertiary">
+                                            <img src="{% static 'img/hero-bestsellers.svg' %}" alt="Best Sellers">
+                                        </div>
+                                    {% endif %}
+                                    <div class="hero-tag">Home & Decor</div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+
+    <section class="home-bar">
+        <div class="container">
+            <div class="home-bar-header">
+                <h2 class="h5 mb-0">Shop by Category</h2>
+                <a class="home-bar-link" href="{% url 'product_list' %}">View All</a>
+            </div>
+            <div class="home-bar-body">
+                <div class="home-bar-grid home-bar-grid--categories">
+                    {% for category in categories %}
+                        <a class="category-card" href="{% url 'category_products' category.id %}">
+                            <div class="category-icon"><i class="bi bi-grid"></i></div>
+                            <div class="category-name">{{ category.name }}</div>
+                        </a>
+                    {% empty %}
+                        <div class="alert alert-info mb-0">No categories available.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="h4 mb-0">Featured Products</h2>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'product_list' %}">View All</a>
+            </div>
+            <div class="row g-4">
+                {% for product in featured_products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card product-card h-100"{% if product.image %} style="--hover-bg: url('{{ product.image.url }}')" {% endif %}>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                    <span class="text-muted">No image</span>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="h6 card-title">{{ product.name }}</h3>
+                                <p class="small text-muted mb-1">
+                                    {% if product.subcategory %}{{ product.subcategory.name }} · {% endif %}
+                                    {% if product.seller %}{{ product.seller.store_name }} · {% endif %}
+                                    {{ product.get_condition_display }}
+                                </p>
+                                <p class="fw-semibold price-tag mb-0">KSh {{ product.price|intcomma }}</p>
+                                <div class="rating-stars small mt-2">
+                                    {% for i in "12345"|make_list %}
+                                        {% if product.avg_rating|default:0 >= forloop.counter %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                                </div>
+                                <a class="stretched-link" href="{% url 'product_detail' product.id %}"></a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info mb-0">No featured products yet.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="h4 mb-4">Best Selling Products</h2>
+            <div class="row g-4">
+                {% for product in best_sellers %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card product-card h-100"{% if product.image %} style="--hover-bg: url('{{ product.image.url }}')" {% endif %}>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                    <span class="text-muted">No image</span>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="h6 card-title">{{ product.name }}</h3>
+                                <p class="small text-muted mb-1">
+                                    {% if product.subcategory %}{{ product.subcategory.name }} · {% endif %}
+                                    {% if product.seller %}{{ product.seller.store_name }} · {% endif %}
+                                    {{ product.get_condition_display }}
+                                </p>
+                                <p class="fw-semibold price-tag mb-0">KSh {{ product.price|intcomma }}</p>
+                                <div class="rating-stars small mt-2">
+                                    {% for i in "12345"|make_list %}
+                                        {% if product.avg_rating|default:0 >= forloop.counter %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                                </div>
+                                <a class="stretched-link" href="{% url 'product_detail' product.id %}"></a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info mb-0">No best sellers yet.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {% for section in category_sections %}
+        <section class="py-5 {% if forloop.counter|divisibleby:2 %}bg-light{% endif %}">
+            <div class="container">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="h4 mb-0">{{ section.category.name }}</h2>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'category_products' section.category.id %}">View All</a>
+                </div>
+                <div class="row g-4">
+                    {% for product in section.products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a class="product-card-link" href="{% url 'product_detail' product.id %}">
+                            <div class="card product-card h-100"{% if product.image %} style="--hover-bg: url('{{ product.image.url }}')" {% endif %}>
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                        <span class="text-muted">No image</span>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h3 class="h6 card-title">{{ product.name }}</h3>
+                                    <p class="small text-muted mb-1">
+                                        {% if product.subcategory %}{{ product.subcategory.name }} Â· {% endif %}
+                                        {% if product.seller %}{{ product.seller.store_name }} Â· {% endif %}
+                                        {{ product.get_condition_display }}
+                                    </p>
+                                    <p class="fw-semibold price-tag mb-0">KSh {{ product.price|intcomma }}</p>
+                                    <div class="rating-stars small mt-2">
+                                        {% for i in "12345"|make_list %}
+                                            {% if product.avg_rating|default:0 >= forloop.counter %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="rating-count">({{ product.review_count|default:0 }})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endfor %}
+
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-banner">
+                <div>
+                    <h2 class="h3 fw-bold mb-2">Get 20% off on selected items</h2>
+                    <p class="mb-3">Limited-time offer on electronics and home essentials.</p>
+                    <a class="btn btn-light" href="{% url 'product_list' %}">Shop Deals</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if user.role == 'customer' %}
+        <h1 class="h3 mb-4">Your Cart</h1>
+
+        {% if items %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-thumb">
+                                        {% endif %}
+                                        <span>
+                                            {{ item.product.name }}
+                                            {% if item.variation %} ({{ item.variation.name }}: {{ item.variation.value }}){% endif %}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'update_cart_item' item.product.id %}" class="d-flex gap-2">
+                                        {% csrf_token %}
+                                        {% if item.variation %}
+                                            <input type="hidden" name="variation" value="{{ item.variation.id }}">
+                                        {% endif %}
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" class="form-control form-control-sm w-auto">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">Update</button>
+                                    </form>
+                                </td>
+                                <td>KSh {{ item.product.price|intcomma }}</td>
+                                <td>KSh {{ item.subtotal|intcomma }}</td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                                        {% csrf_token %}
+                                        {% if item.variation %}
+                                            <input type="hidden" name="variation" value="{{ item.variation.id }}">
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mt-4">
+                <p class="h5 mb-0">Total: KSh {{ cart.total_price|intcomma }}</p>
+                <a class="btn btn-primary" href="{% url 'delivery_confirm' %}">Checkout</a>
+            </div>
+        {% else %}
+            <div class="alert alert-info">Your cart is empty.</div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning">Access restricted. Only customers can view the cart.</div>
+    {% endif %}
+{% endblock %}
+

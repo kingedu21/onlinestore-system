@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        {% if not seller %}
+            <div class="alert alert-warning">
+                No seller profile found for your account. Please contact support.
+            </div>
+        {% else %}
+            {% if seller.is_suspicious %}
+                <div class="seller-flag-banner">
+                    <strong>Account flagged for review.</strong>
+                    {% if seller.suspicious_reason %}
+                        <div class="small mt-1">{{ seller.suspicious_reason }}</div>
+                    {% else %}
+                        <div class="small mt-1">Please contact support for details.</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="h4 mb-1">{{ seller.store_name }}</h1>
+                    <p class="text-muted mb-0">Seller Dashboard</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'seller_products' %}">My Products</a>
+                    <a class="btn btn-accent btn-sm" href="{% url 'seller_product_create' %}">Add Product</a>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Orders Received</div>
+                            <div class="stat-value">{{ orders_received }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Pending Shipment</div>
+                            <div class="stat-value">{{ orders_pending_shipment }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Completed Orders</div>
+                            <div class="stat-value">{{ completed_orders }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Net Earnings</div>
+                            <div class="stat-value">KSh {{ total_earnings|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Total Sales</div>
+                            <div class="stat-value">KSh {{ total_sales|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Commission Deducted</div>
+                            <div class="stat-value">KSh {{ total_commission|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value">{{ total_products }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Customer Reviews</div>
+                            <div class="stat-value">{{ review_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="stat-label">Recent Orders</div>
+                            <div class="stat-value">{{ recent_orders|length }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-lg-8">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="h6 mb-3">Sales & Earnings Overview</h2>
+                            <canvas id="sellerChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="h6 mb-3">Overview</h2>
+                            <p class="text-muted mb-0">Track your sales performance and order flow at a glance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Low Stock Products</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in low_stock %}
+                                    <tr>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.stock }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="2" class="text-muted">No low stock items.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Recent Orders</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>KSh {{ order.total_price|intcomma }}</td>
+                                        <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
+                                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-muted">No recent orders.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var ctx = document.getElementById('sellerChart');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: {{ chart_sales|safe }},
+                            borderColor: '#f68b1e',
+                            backgroundColor: 'rgba(246, 139, 30, 0.15)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Orders',
+                            data: {{ chart_orders|safe }},
+                            borderColor: '#6f46a6',
+                            backgroundColor: 'rgba(111, 70, 166, 0.12)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Earnings',
+                            data: {{ chart_earnings|safe }},
+                            borderColor: '#1f2f5c',
+                            backgroundColor: 'rgba(31, 47, 92, 0.12)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })();
+    </script>
+{% endblock %}
+

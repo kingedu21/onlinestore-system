@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="mb-4">
+            <h1 class="h3">Payment Options</h1>
+            <p class="text-muted mb-0">Choose the payment method that works best for you.</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">M-Pesa</h6>
+                        <p class="mb-0">Pay instantly using your mobile phone for quick confirmation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Card</h6>
+                        <p class="mb-0">Use your debit or credit card for secure online payments.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Cash on Delivery</h6>
+                        <p class="mb-0">Pay in cash when your order arrives at your doorstep.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

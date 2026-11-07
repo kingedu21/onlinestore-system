@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold">Sell on OnlineStore</h1>
+                    <p class="lead">
+                        Reach more customers, grow your brand, and manage everything from one seller dashboard.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if user.is_authenticated and user.role == 'customer' %}
+                            <a class="btn btn-accent btn-lg" href="{% url 'become_seller' %}">Become a Seller</a>
+                        {% elif not user.is_authenticated %}
+                            <a class="btn btn-accent btn-lg" href="{% url 'login' %}">Become a Seller</a>
+                        {% endif %}
+                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'seller_products' %}">Seller Dashboard</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-card">
+                        <div class="hero-card-inner">
+                            <h5 class="fw-bold mb-2">Trusted by local sellers</h5>
+                            <p class="text-muted mb-0">
+                                List products, track orders, and get paid — all in one place.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">1. Register</h3>
+                            <p class="text-muted mb-0">Create a seller account and complete your profile.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">2. Add Products</h3>
+                            <p class="text-muted mb-0">Upload product details, variations, and photos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">3. Get Approved</h3>
+                            <p class="text-muted mb-0">Admin reviews listings to keep quality high.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">4. Start Selling</h3>
+                            <p class="text-muted mb-0">Your products go live once approved.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">5. Fulfill Orders</h3>
+                            <p class="text-muted mb-0">Prepare items and ship to customers.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">6. Get Paid</h3>
+                            <p class="text-muted mb-0">Track earnings and commission in your dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="h5 mb-4">Why Sell With Us</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-people"></i></div>
+                        <h3 class="h6 fw-bold">Reach More Customers</h3>
+                        <p class="text-muted mb-0">Show your products to shoppers across Kenya every day.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-coin"></i></div>
+                        <h3 class="h6 fw-bold">Grow Your Earnings</h3>
+                        <p class="text-muted mb-0">Boost your sales with featured visibility and campaigns.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-box-seam"></i></div>
+                        <h3 class="h6 fw-bold">We Handle Logistics</h3>
+                        <p class="text-muted mb-0">Pickup, delivery, and customer service support you.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-shop"></i></div>
+                        <h3 class="h6 fw-bold">Free to Start</h3>
+                        <p class="text-muted mb-0">Open your store and list products at no cost.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h3 class="h6 fw-bold">Seller Training</h3>
+                        <p class="text-muted mb-0">Learn how to sell better with tips and guidance.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="sell-feature">
+                        <div class="sell-icon"><i class="bi bi-headset"></i></div>
+                        <h3 class="h6 fw-bold">Dedicated Support</h3>
+                        <p class="text-muted mb-0">Our team is ready to help whenever you need.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="h5 mb-0">Seller Requirements</h2>
+                <span class="text-muted small">What you need to get started</span>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Valid email & phone number</li>
+                <li class="list-group-item">Clear product photos and descriptions</li>
+                <li class="list-group-item">Accurate stock & pricing</li>
+                <li class="list-group-item">Commitment to fast fulfillment</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="h5 mb-3">Vendor to Customer Flow</h2>
+            <div class="card">
+                <div class="card-body">
+                    <svg class="er-svg" viewBox="0 0 1200 260" role="img" aria-label="Vendor to customer flow diagram">
+                        <defs>
+                            <linearGradient id="erGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ffffff"/>
+                                <stop offset="100%" stop-color="#f7f7f7"/>
+                            </linearGradient>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 z" fill="#f68b1e"></path>
+                            </marker>
+                        </defs>
+                        <g fill="url(#erGrad)" stroke="#e6e6e6" stroke-width="2">
+                            <rect x="20" y="80" rx="22" ry="22" width="150" height="60"></rect>
+                            <rect x="190" y="80" rx="22" ry="22" width="170" height="60"></rect>
+                            <rect x="380" y="80" rx="22" ry="22" width="170" height="60"></rect>
+                            <rect x="570" y="80" rx="22" ry="22" width="170" height="60"></rect>
+                            <rect x="760" y="80" rx="22" ry="22" width="170" height="60"></rect>
+                            <rect x="950" y="80" rx="22" ry="22" width="210" height="60"></rect>
+                        </g>
+                        <g stroke="#f68b1e" stroke-width="3" marker-end="url(#arrow)">
+                            <line x1="170" y1="110" x2="190" y2="110"></line>
+                            <line x1="360" y1="110" x2="380" y2="110"></line>
+                            <line x1="550" y1="110" x2="570" y2="110"></line>
+                            <line x1="740" y1="110" x2="760" y2="110"></line>
+                            <line x1="930" y1="110" x2="950" y2="110"></line>
+                        </g>
+                        <g class="er-icon" stroke="#1b1b1b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <g transform="translate(70 92)">
+                                <rect x="0" y="0" width="20" height="16" rx="2"></rect>
+                                <line x1="0" y1="6" x2="20" y2="6"></line>
+                                <line x1="6" y1="16" x2="6" y2="20"></line>
+                                <line x1="14" y1="16" x2="14" y2="20"></line>
+                            </g>
+                            <g transform="translate(250 92)">
+                                <line x1="0" y1="2" x2="20" y2="2"></line>
+                                <line x1="0" y1="8" x2="20" y2="8"></line>
+                                <line x1="0" y1="14" x2="20" y2="14"></line>
+                            </g>
+                            <g transform="translate(440 90)">
+                                <path d="M10 0 C3 2 0 7 0 12 C0 18 5 22 10 24 C15 22 20 18 20 12 C20 7 17 2 10 0 Z"></path>
+                                <polyline points="6,12 9,15 14,9"></polyline>
+                            </g>
+                            <g transform="translate(630 92)">
+                                <rect x="0" y="2" width="20" height="12" rx="2"></rect>
+                                <circle cx="6" cy="18" r="2"></circle>
+                                <circle cx="14" cy="18" r="2"></circle>
+                            </g>
+                            <g transform="translate(820 90)">
+                                <circle cx="6" cy="18" r="3"></circle>
+                                <circle cx="16" cy="18" r="3"></circle>
+                                <polyline points="0,2 4,2 7,12 18,12"></polyline>
+                                <line x1="8" y1="2" x2="18" y2="2"></line>
+                            </g>
+                            <g transform="translate(1030 90)">
+                                <rect x="0" y="2" width="22" height="14" rx="2"></rect>
+                                <line x1="0" y1="8" x2="22" y2="8"></line>
+                                <line x1="6" y1="18" x2="16" y2="18"></line>
+                            </g>
+                        </g>
+                        <g font-family="Manrope, Segoe UI, sans-serif" font-size="15" fill="#1b1b1b" text-anchor="middle">
+                            <text x="95" y="140">Product Listing</text>
+                            <text x="275" y="140">Admin Approval</text>
+                            <text x="465" y="140">Marketplace</text>
+                            <text x="655" y="140">Customer Order</text>
+                            <text x="845" y="140">Payment</text>
+                            <text x="1055" y="140">Fulfillment</text>
+                        </g>
+                        <g font-family="Manrope, Segoe UI, sans-serif" font-size="13" text-anchor="middle">
+                            <text x="95" y="160" fill="#d97706">Vendor</text>
+                            <text x="465" y="160" fill="#2563eb">OnlineStore</text>
+                            <text x="655" y="160" fill="#16a34a">Customer</text>
+                            <text x="1055" y="160" fill="#6c6c6c">Delivery & Rating</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

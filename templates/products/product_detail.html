@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="breadcrumb-bar small text-muted mb-3">
+        Home <span class="mx-2">></span>
+        {{ product.category.name }}
+        {% if product.subcategory %}<span class="mx-2">></span> {{ product.subcategory.name }}{% endif %}
+        <span class="mx-2">></span> {{ product.name|truncatechars:28 }}
+        <span class="text-muted ms-2">SKU: {{ product.id }}</span>
+    </div>
+
+    <div class="row g-4 align-items-start product-detail">
+        <div class="col-lg-6">
+            <div class="card product-gallery shadow-sm">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                    <div class="placeholder-image d-flex align-items-center justify-content-center">
+                        <span class="text-muted">No image</span>
+                    </div>
+                {% endif %}
+            </div>
+            {% if product.images.all %}
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    {% for img in product.images.all %}
+                        <img src="{{ img.image.url }}" class="rounded border thumb-tile" alt="{{ product.name }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-6">
+            <h1 class="h4 mb-2">{{ product.name }}</h1>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="rating-stars">
+                    {% for i in "12345"|make_list %}
+                        {% if average_rating|floatformat:0 >= forloop.counter %}
+                            <i class="bi bi-star-fill"></i>
+                        {% else %}
+                            <i class="bi bi-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="rating-count">{{ average_rating }}/5</span>
+                </div>
+                <span class="small text-muted">{{ reviews|length }} Customer reviews</span>
+            </div>
+
+            <div class="price-panel mb-3">
+                <div class="price-tag h4 mb-0">KSh {{ product.price|intcomma }}</div>
+                <div class="text-muted small">Best price guarantee</div>
+            </div>
+
+            <div class="mb-3">
+                <span class="badge bg-secondary">{{ product.get_condition_display }}</span>
+                {% if product.stock > 0 %}
+                    <span class="badge bg-success">In Stock</span>
+                {% else %}
+                    <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            {% if product.seller %}
+                <div class="service-row mb-3">
+                    <span class="text-muted">Services:</span>
+                    <span><i class="bi bi-check-circle-fill text-success me-1"></i>Fulfilled by {{ product.seller.store_name }}</span>
+                </div>
+            {% endif %}
+
+            <p class="text-muted">{{ product.description }}</p>
+
+            {% if user.is_authenticated and user.role == 'customer' %}
+                <form method="post" action="{% url 'add_to_cart' product.id %}" class="product-buy-form">
+                    {% csrf_token %}
+                    {% if active_variations %}
+                        {% regroup active_variations by name as variation_groups %}
+                        <input type="hidden" name="variation" id="variationInput" value="{{ initial_variation_id }}">
+                        {% for group in variation_groups %}
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <label class="form-label mb-1">{{ group.grouper }}</label>
+                                    {% if group.grouper|lower == 'size' %}
+                                        <a class="size-guide small" href="#">Size Guide</a>
+                                    {% endif %}
+                                </div>
+                                <div class="variation-grid">
+                                    {% for v in group.list %}
+                                        <button
+                                            type="button"
+                                            class="variation-pill{% if v.id == initial_variation_id %} active{% endif %}"
+                                            data-variation-id="{{ v.id }}"
+                                        >
+                                            {{ v.value }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label mb-1">Quantity</label>
+                        <div class="quantity-stepper">
+                            <button type="button" class="qty-btn" data-action="dec">-</button>
+                            <input type="number" name="quantity" value="1" min="1" class="form-control qty-input">
+                            <button type="button" class="qty-btn" data-action="inc">+</button>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-cart">Add to Cart</button>
+                        <button type="submit" class="btn btn-buy" formaction="{% url 'buy_now' product.id %}">Buy Now</button>
+                        {% if is_in_wishlist %}
+                            <a class="btn btn-outline-secondary" href="{% url 'remove_from_wishlist' product.id %}"><i class="bi bi-heart-fill me-1"></i>Wishlist</a>
+                        {% else %}
+                            <a class="btn btn-outline-secondary" href="{% url 'add_to_wishlist' product.id %}"><i class="bi bi-heart me-1"></i>Wishlist</a>
+                        {% endif %}
+                    </div>
+                </form>
+            {% elif not user.is_authenticated %}
+                <a class="btn btn-primary" href="{% url 'login' %}">Login to Add</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="mt-5">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h2 class="h5 mb-0">Customer Reviews</h2>
+            <div class="rating-stars">
+                {% for i in "12345"|make_list %}
+                    {% if average_rating|floatformat:0 >= forloop.counter %}
+                        <i class="bi bi-star-fill"></i>
+                    {% else %}
+                        <i class="bi bi-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="small text-muted ms-2">{{ average_rating }}/5</span>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-lg-7">
+                {% for review in reviews %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ review.user.username }}</strong>
+                                <div class="rating-stars">
+                                    {% for i in "12345"|make_list %}
+                                        {% if review.rating >= forloop.counter %}
+                                            <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="mb-1">{{ review.comment }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-info">No reviews yet.</div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="mb-3">Leave a Review</h6>
+                        {% if user.is_authenticated and user.role == 'customer' %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label d-block">Rating</label>
+                                    <div class="star-rating">
+                                        {% for radio in review_form.rating reversed %}
+                                            {{ radio.tag }}
+                                            <label for="{{ radio.id_for_label }}">★</label>
+                                        {% endfor %}
+                                    </div>
+                                    {% if review_form.rating.errors %}
+                                        <div class="text-danger small">{{ review_form.rating.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="{{ review_form.comment.id_for_label }}">Comment</label>
+                                    {{ review_form.comment }}
+                                    {% if review_form.comment.errors %}
+                                        <div class="text-danger small">{{ review_form.comment.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="btn btn-accent">Submit Review</button>
+                            </form>
+                        {% elif not user.is_authenticated %}
+                            <p class="text-muted mb-0">Please login to leave a review.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-5">
+        <h2 class="h5 mb-3">Related Products</h2>
+        <div class="row g-4">
+            {% for item in related_products %}
+                <div class="col-6 col-md-3">
+                    <div class="card product-card h-100"{% if item.image %} style="--hover-bg: url('{{ item.image.url }}')" {% endif %}>
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                        {% else %}
+                            <div class="card-img-top placeholder-image d-flex align-items-center justify-content-center">
+                                <span class="text-muted">No image</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ item.name }}</h6>
+                            <p class="fw-semibold price-tag mb-2">KSh {{ item.price|intcomma }}</p>
+                            <div class="rating-stars small">
+                                {% for i in "12345"|make_list %}
+                                    {% if item.avg_rating|default:0 >= forloop.counter %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rating-count">({{ item.review_count|default:0 }})</span>
+                            </div>
+                            <a class="stretched-link" href="{% url 'product_detail' item.id %}"></a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">No related products.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        (function () {
+            var variationInput = document.getElementById('variationInput');
+            var pills = document.querySelectorAll('.variation-pill');
+            if (variationInput && pills.length) {
+                pills.forEach(function (pill) {
+                    pill.addEventListener('click', function () {
+                        pills.forEach(function (item) { item.classList.remove('active'); });
+                        pill.classList.add('active');
+                        variationInput.value = pill.getAttribute('data-variation-id');
+                    });
+                });
+            }
+
+            var qtyWrap = document.querySelector('.quantity-stepper');
+            var qtyInput = document.querySelector('.qty-input');
+            if (qtyWrap && qtyInput) {
+                qtyWrap.addEventListener('click', function (event) {
+                    var btn = event.target.closest('.qty-btn');
+                    if (!btn) return;
+                    var current = parseInt(qtyInput.value || '1', 10);
+                    if (btn.dataset.action === 'inc') {
+                        current += 1;
+                    } else {
+                        current = Math.max(1, current - 1);
+                    }
+                    qtyInput.value = current;
+                });
+            }
+        })();
+    </script>
+{% endblock %}

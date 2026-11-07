@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+            <div>
+                <h1 class="h4 mb-1">Order Details</h1>
+                <p class="text-muted mb-0">Order #{{ order.id }}</p>
+            </div>
+            <div class="d-flex gap-2 mt-3 mt-sm-0">
+                <a class="btn btn-outline-primary" href="{% url 'order_invoice' order.id %}">Print Invoice</a>
+                {% if order.receipt %}
+                    <a class="btn btn-primary" href="{% url 'order_receipt' order.id %}">Print Receipt</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-lg-7">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-3">Products Purchased</h6>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-end">Price</th>
+                                        <th class="text-end">Qty</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.items.all %}
+                                        <tr>
+                                            <td>{{ item.product.name }}</td>
+                                            <td class="text-end">KSh {{ item.price|intcomma }}</td>
+                                            <td class="text-end">{{ item.quantity }}</td>
+                                            <td class="text-end">KSh {{ item.subtotal|intcomma }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">No items found.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="text-end">
+                                <p class="mb-1 text-muted">Total</p>
+                                <p class="h5 mb-0">KSh {{ order.total_price|intcomma }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Order Summary</h6>
+                        <p class="mb-1">Status: <strong>{{ order.get_status_display }}</strong></p>
+                        <p class="mb-1">Payment: {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})</p>
+                        {% if order.payment_method == 'mpesa' and order.payment_status != 'paid' %}
+                            <div class="mt-3">
+                                <form method="post" action="{% url 'retry_mpesa' order.id %}">
+                                    {% csrf_token %}
+                                    <div class="mb-2">
+                                        <label class="form-label" for="mpesa_phone">M-Pesa Phone Number</label>
+                                        <input
+                                            class="form-control"
+                                            id="mpesa_phone"
+                                            name="mpesa_phone"
+                                            placeholder="07XXXXXXXX"
+                                            type="text"
+                                            value="{{ mpesa_phone }}"
+                                        >
+                                    </div>
+                                    <button class="btn btn-accent w-100" type="submit">Retry M-Pesa</button>
+                                </form>
+                                {% if latest_mpesa %}
+                                    <p class="text-muted small mt-2 mb-0">
+                                        Last attempt: {{ latest_mpesa.created_at|date:"M d, Y H:i" }}
+                                        {% if latest_mpesa.result_desc %}- {{ latest_mpesa.result_desc }}{% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if order.user.address %}
+                            <p class="mb-1">Delivery Address: {{ order.user.address }}</p>
+                        {% endif %}
+                        {% if order.delivery_county %}
+                            <p class="mb-1">Delivery Location: {{ order.delivery_county }}{% if order.delivery_town %}, {{ order.delivery_town }}{% endif %}</p>
+                            <p class="mb-1">Delivery Method: {{ order.get_delivery_method_display }}</p>
+                        {% endif %}
+                        <p class="mb-1">Shipping Fee: KSh {{ order.shipping_fee|intcomma }}</p>
+                        <p class="mb-0">Placed: {{ order.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-2">Order Tracking</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for entry in order.tracking_entries.all %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ entry.get_status_display }}</span>
+                                    <span class="text-muted small">{{ entry.timestamp|date:"M d, Y H:i" }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">Tracking updates will appear here.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
